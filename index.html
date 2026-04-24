@@ -156,7 +156,6 @@
         import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, deleteDoc, doc, getDocs } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-        // CONFIG FIREBASE ANDA
         const firebaseConfig = {
             apiKey: "AIzaSyAYF740-reiHPYvQ9L2dceWwioSPzHI4RY",
             authDomain: "web-nurul-ilmi.firebaseapp.com",
@@ -170,7 +169,6 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         
-        // Setup Global agar bisa diakses script biasa
         window.db = db;
         window.auth = auth;
         window.appId = 'web-nurul-ilmi'; 
@@ -182,7 +180,6 @@
         window.serverTimestamp = serverTimestamp;
         window.onSnapshot = onSnapshot;
 
-        // Login Anonim sebelum query dimulai (Rule 3)
         async function startAuth() {
             try {
                 await signInAnonymously(auth);
@@ -244,7 +241,7 @@
         function startQuiz() {
             const name = document.getElementById('student-name').value.trim();
             const cls = document.getElementById('student-class').value.trim();
-            if(!name || !cls) return showModal("تنبيه", "يرجى إدخال الاسم والفصل");
+            if(!name || !cls) return showModal("تنبيه", "يرjى إدخال الاسم والفصل");
             studentData = { name, class: cls };
             document.getElementById('display-student-info').innerText = `الطالب: ${name} | الفصل: ${cls}`;
             idx = 0; userAnswers.fill(null);
@@ -253,15 +250,24 @@
 
         function loadQuestion() {
             const q = questions[idx];
+            const labels = ['أ', 'ب', 'ج', 'د'];
             document.getElementById('question-text').innerText = q.q;
             document.getElementById('question-counter').innerText = `السؤال ${idx+1} من ${questions.length}`;
             document.getElementById('progress-bar').style.width = `${((idx+1)/questions.length)*100}%`;
             const container = document.getElementById('options-container');
             container.innerHTML = '';
+            
             q.a.forEach((opt, i) => {
                 const btn = document.createElement('button');
-                btn.className = `option-btn w-full text-right p-4 rounded-xl font-bold ${userAnswers[idx] === i ? 'selected-option' : ''}`;
-                btn.innerText = opt;
+                btn.className = `option-btn w-full text-right p-4 rounded-xl font-bold flex items-start gap-2 ${userAnswers[idx] === i ? 'selected-option' : ''}`;
+                
+                // Menambahkan label أ ب ج د untuk soal nomor 1-10 (index 0-9)
+                if (idx < 10) {
+                    btn.innerHTML = `<span class="text-emerald-600 ml-2 font-black">${labels[i]})</span> <span>${opt}</span>`;
+                } else {
+                    btn.innerText = opt;
+                }
+                
                 btn.onclick = () => { userAnswers[idx] = i; loadQuestion(); };
                 container.appendChild(btn);
             });
@@ -290,7 +296,7 @@
                 try {
                     await window.signInAnonymously(window.auth);
                 } catch (e) {
-                    showModal("خطأ", "لم يتم تسجيل الدخول بعد. يرجى الانتظar.");
+                    showModal("خطأ", "لم يتم تسجيل الدخول بعد. يرجى الانتظار.");
                     btn.disabled = false; btn.innerText = "إرسال";
                     return;
                 }
@@ -300,7 +306,6 @@
             userAnswers.forEach((ans, i) => { if(ans === questions[i].c) score++; });
             
             try {
-                // Jalur wajib Rule 1
                 const resultsRef = window.collection(window.db, 'artifacts', window.appId, 'public', 'data', 'quiz_results');
                 await window.addDoc(resultsRef, { 
                     student_name: studentData.name, 
@@ -321,12 +326,22 @@
 
         function loadReview() {
             const container = document.getElementById('review-list');
+            const labels = ['أ', 'ب', 'ج', 'د'];
             container.innerHTML = questions.map((q, i) => {
                 const isCorrect = userAnswers[i] === q.c;
+                let studentAns = userAnswers[i] !== null ? q.a[userAnswers[i]] : 'لم تجب';
+                let correctAns = q.a[q.c];
+                
+                // Menambahkan label pada tampilan review
+                if (i < 10) {
+                    if (userAnswers[i] !== null) studentAns = `${labels[userAnswers[i]]}) ${studentAns}`;
+                    correctAns = `${labels[q.c]}) ${correctAns}`;
+                }
+
                 return `<div class="review-card ${isCorrect ? 'correct' : 'incorrect'} shadow-sm">
                     <p class="font-bold mb-2">${q.q}</p>
-                    <p class="text-sm">إجابتك: ${userAnswers[i] !== null ? q.a[userAnswers[i]] : 'لم تجب'}</p>
-                    ${!isCorrect ? `<p class="text-sm text-emerald-600 font-bold">الصحيحة: ${q.a[q.c]}</p>` : ''}
+                    <p class="text-sm">إجابتك: ${studentAns}</p>
+                    ${!isCorrect ? `<p class="text-sm text-emerald-600 font-bold">الصحيحة: ${correctAns}</p>` : ''}
                 </div>`;
             }).join('');
             switchView('review');
@@ -366,9 +381,7 @@
             const checkboxes = document.querySelectorAll('#results-body input[type="checkbox"]');
             checkboxes.forEach(cb => {
                 cb.checked = masterCb.checked;
-                // Ambil ID dari fungsi toggleSelect manual atau mapping ulang
             });
-            // Untuk kesederhanaan, mari gunakan Set manual
             selectedResults.clear();
             if (masterCb.checked) {
                 allResults.forEach(r => selectedResults.add(r.id));
