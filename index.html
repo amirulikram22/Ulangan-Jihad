@@ -28,6 +28,7 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
+    <!-- Modal Peringatan -->
     <div id="custom-modal">
         <div class="modal-content">
             <div id="modal-icon" class="text-4xl mb-3">⚠️</div>
@@ -40,6 +41,7 @@
         </div>
     </div>
 
+    <!-- Modal Login Guru -->
     <div id="login-modal">
         <div class="modal-content shadow-2xl">
             <div class="text-4xl mb-3">🔐</div>
@@ -48,7 +50,7 @@
             <input type="text" id="teacher-username" class="input-field text-center mb-3" placeholder="اسم المستخدم">
             <div class="mb-6 relative">
                 <input type="password" id="teacher-pin" class="input-field text-center pl-12" placeholder="كلمة المرور">
-                <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 left-0 w-12 flex items-center justify-center text-gray-400">
+                <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 left-0 w-12 flex items-center justify-center text-gray-400 focus:outline-none">
                     <svg id="eye-open" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                     <svg id="eye-closed" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2" d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><circle cx="12" cy="12" r="3"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
                 </button>
@@ -60,6 +62,7 @@
         </div>
     </div>
 
+    <!-- 1. Sampul -->
     <div id="cover-page" class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 flex flex-col items-center">
         <div class="logo-box"><span class="text-5xl text-white">🕌</span></div>
         <div class="text-center mb-6">
@@ -81,6 +84,7 @@
         <button onclick="openLoginModal()" class="text-gray-400 text-xs font-bold">دخول المعلم (Dashboard)</button>
     </div>
 
+    <!-- 2. Kuis -->
     <div id="quiz-container" class="hidden max-w-2xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
         <div class="bg-emerald-700 p-6 text-white flex justify-between items-center">
             <button onclick="goToCover()" class="text-xs bg-white/20 px-3 py-2 rounded-lg">🏠 الرئيسية</button>
@@ -101,6 +105,7 @@
         </div>
     </div>
 
+    <!-- 3. Hasil -->
     <div id="result-screen" class="hidden max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 text-center">
         <div class="text-6xl mb-4">🎖️</div>
         <h2 class="text-3xl font-black mb-1">النتيجة النهائية</h2>
@@ -112,11 +117,13 @@
         </div>
     </div>
 
+    <!-- 4. Review -->
     <div id="review-page" class="hidden max-w-2xl w-full flex flex-col h-[90vh] bg-white rounded-3xl shadow-2xl overflow-hidden">
         <div class="bg-emerald-700 p-6 text-white flex justify-between items-center"><h2 class="text-xl font-bold">مراجعة الإجابات 📝</h2><button onclick="switchView('results')" class="bg-white/20 px-4 py-2 rounded-lg font-bold">إغلاق</button></div>
         <div id="review-list" class="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50"></div>
     </div>
 
+    <!-- 5. Dashboard -->
     <div id="dashboard-page" class="hidden max-w-5xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden mt-8 self-start">
         <div class="bg-slate-800 p-6 text-white flex justify-between items-center">
             <h2 class="text-xl font-bold">لوحة النتائج 📊</h2>
@@ -128,8 +135,18 @@
         </div>
         <div class="p-6 overflow-x-auto">
             <table>
-                <thead><tr><th><input type="checkbox" onchange="toggleSelectAll(this)"></th><th>الاسم</th><th>الفصل</th><th>الدرجة</th><th>التاريخ</th></tr></thead>
-                <tbody id="results-body"></tbody>
+                <thead>
+                    <tr>
+                        <th class="w-12"><input type="checkbox" onchange="toggleSelectAll(this)"></th>
+                        <th>الاسم</th>
+                        <th>الفصل</th>
+                        <th>الدرجة</th>
+                        <th>التاريخ</th>
+                    </tr>
+                </thead>
+                <tbody id="results-body">
+                    <tr><td colspan="5" class="text-center py-10 text-gray-400">لا توجد نتائج مسجلة</td></tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -139,7 +156,7 @@
         import { getFirestore, collection, addDoc, serverTimestamp, onSnapshot, deleteDoc, doc, getDocs } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 
-        // CONFIG FIREBASE MILIK ANDA
+        // CONFIG FIREBASE ANDA
         const firebaseConfig = {
             apiKey: "AIzaSyAYF740-reiHPYvQ9L2dceWwioSPzHI4RY",
             authDomain: "web-nurul-ilmi.firebaseapp.com",
@@ -153,6 +170,7 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         
+        // Setup Global agar bisa diakses script biasa
         window.db = db;
         window.auth = auth;
         window.appId = 'web-nurul-ilmi'; 
@@ -164,10 +182,21 @@
         window.serverTimestamp = serverTimestamp;
         window.onSnapshot = onSnapshot;
 
-        signInAnonymously(auth).catch(err => console.error("Firebase Login Error:", err));
+        // Login Anonim sebelum query dimulai (Rule 3)
+        async function startAuth() {
+            try {
+                await signInAnonymously(auth);
+            } catch (err) {
+                console.error("Firebase Login Error:", err);
+            }
+        }
+        startAuth();
+
         onAuthStateChanged(auth, user => {
             window.currentUser = user;
-            if (user && window.currentView === 'dashboard') listenToResults();
+            if (user && window.currentView === 'dashboard') {
+                listenToResults();
+            }
         });
     </script>
 
@@ -200,6 +229,7 @@
         let studentData = { name: "", class: "" };
         let allResults = [];
         let selectedResults = new Set();
+        let resultsUnsubscribe = null;
 
         function switchView(view) {
             window.currentView = view;
@@ -255,21 +285,45 @@
         async function performSubmission() {
             const btn = document.getElementById('next-nav-btn');
             btn.disabled = true; btn.innerHTML = '<span class="loader"></span>';
-            let score = 0; userAnswers.forEach((ans, i) => { if(ans === questions[i].c) score++; });
+            
+            if (!window.currentUser) {
+                try {
+                    await window.signInAnonymously(window.auth);
+                } catch (e) {
+                    showModal("خطأ", "لم يتم تسجيل الدخول بعد. يرجى الانتظar.");
+                    btn.disabled = false; btn.innerText = "إرسال";
+                    return;
+                }
+            }
+
+            let score = 0; 
+            userAnswers.forEach((ans, i) => { if(ans === questions[i].c) score++; });
+            
             try {
-                const resultsRef = window.collection(window.db, 'quiz_results');
-                await window.addDoc(resultsRef, { student_name: studentData.name, student_class: studentData.class, score, total: questions.length, timestamp: window.serverTimestamp() });
+                // Jalur wajib Rule 1
+                const resultsRef = window.collection(window.db, 'artifacts', window.appId, 'public', 'data', 'quiz_results');
+                await window.addDoc(resultsRef, { 
+                    student_name: studentData.name, 
+                    student_class: studentData.class, 
+                    score, 
+                    total: questions.length, 
+                    timestamp: window.serverTimestamp() 
+                });
                 document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
                 document.getElementById('result-student-name').innerText = studentData.name;
                 switchView('results');
-            } catch(e) { showModal("خطأ", "فشل الإرسال: " + e.message); btn.disabled = false; btn.innerText = "إرسال"; }
+            } catch(e) { 
+                console.error("Submission Error:", e);
+                showModal("خطأ", "فشل الإرسال: " + e.message); 
+                btn.disabled = false; btn.innerText = "إرسال"; 
+            }
         }
 
         function loadReview() {
             const container = document.getElementById('review-list');
             container.innerHTML = questions.map((q, i) => {
                 const isCorrect = userAnswers[i] === q.c;
-                return `<div class="review-card ${isCorrect ? 'correct' : 'incorrect'}">
+                return `<div class="review-card ${isCorrect ? 'correct' : 'incorrect'} shadow-sm">
                     <p class="font-bold mb-2">${q.q}</p>
                     <p class="text-sm">إجابتك: ${userAnswers[i] !== null ? q.a[userAnswers[i]] : 'لم تجب'}</p>
                     ${!isCorrect ? `<p class="text-sm text-emerald-600 font-bold">الصحيحة: ${q.a[q.c]}</p>` : ''}
@@ -279,38 +333,86 @@
         }
 
         function listenToResults() {
-            const ref = window.collection(window.db, 'quiz_results');
-            window.onSnapshot(ref, snap => {
+            if (!window.currentUser) return;
+            if (resultsUnsubscribe) resultsUnsubscribe();
+
+            const ref = window.collection(window.db, 'artifacts', window.appId, 'public', 'data', 'quiz_results');
+            resultsUnsubscribe = window.onSnapshot(ref, snap => {
                 allResults = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
                 const body = document.getElementById('results-body');
-                body.innerHTML = allResults.map(res => `<tr>
-                    <td><input type="checkbox" onchange="toggleSelect('${res.id}', this)"></td>
-                    <td class="font-bold">${res.student_name}</td>
-                    <td>${res.student_class}</td>
-                    <td class="font-bold text-emerald-600">${res.score}/${res.total}</td>
-                    <td class="text-xs text-gray-400">${res.timestamp ? new Date(res.timestamp.seconds*1000).toLocaleString('ar-EG') : '...'}</td>
-                </tr>`).join('');
+                if (allResults.length === 0) {
+                    body.innerHTML = '<tr><td colspan="5" class="text-center py-10 text-gray-400">لا توجد نتائج مسجلة</td></tr>';
+                } else {
+                    body.innerHTML = allResults.map(res => `<tr>
+                        <td><input type="checkbox" onchange="toggleSelect('${res.id}', this)" class="w-4 h-4"></td>
+                        <td class="font-bold text-slate-700">${res.student_name}</td>
+                        <td>${res.student_class}</td>
+                        <td class="font-bold text-emerald-600">${res.score}/${res.total}</td>
+                        <td class="text-xs text-gray-400">${res.timestamp ? new Date(res.timestamp.seconds*1000).toLocaleString('ar-EG') : '...'}</td>
+                    </tr>`).join('');
+                }
+            }, err => {
+                console.error("Firestore Listen Error:", err);
             });
         }
 
-        function toggleSelect(id, cb) { if(cb.checked) selectedResults.add(id); else selectedResults.delete(id); document.getElementById('delete-selected-btn').classList.toggle('hidden', selectedResults.size === 0); }
+        function toggleSelect(id, cb) { 
+            if(cb.checked) selectedResults.add(id); 
+            else selectedResults.delete(id); 
+            document.getElementById('delete-selected-btn').classList.toggle('hidden', selectedResults.size === 0); 
+        }
+
+        function toggleSelectAll(masterCb) {
+            const checkboxes = document.querySelectorAll('#results-body input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                cb.checked = masterCb.checked;
+                // Ambil ID dari fungsi toggleSelect manual atau mapping ulang
+            });
+            // Untuk kesederhanaan, mari gunakan Set manual
+            selectedResults.clear();
+            if (masterCb.checked) {
+                allResults.forEach(r => selectedResults.add(r.id));
+            }
+            document.getElementById('delete-selected-btn').classList.toggle('hidden', selectedResults.size === 0);
+        }
+
         async function deleteSelected() {
             if(!confirm(`حذف ${selectedResults.size} نتيجة؟`)) return;
-            for(const id of selectedResults) await window.deleteDoc(window.doc(window.db, 'quiz_results', id));
+            for(const id of selectedResults) {
+                try {
+                    await window.deleteDoc(window.doc(window.db, 'artifacts', window.appId, 'public', 'data', 'quiz_results', id));
+                } catch (e) {
+                    console.error("Delete error:", e);
+                }
+            }
             selectedResults.clear();
+            document.getElementById('delete-selected-btn').classList.add('hidden');
         }
 
         function exportCSV() {
-            let csv = "\uFEFFالاسم,الفصل,الدرجة\n";
-            allResults.forEach(r => csv += `"${r.student_name}","${r.student_class}","${r.score}/${r.total}"\n`);
+            if (allResults.length === 0) return;
+            let csv = "\uFEFFالاسم,الفصل,الدرجة,التاريخ\n";
+            allResults.forEach(r => {
+                const date = r.timestamp ? new Date(r.timestamp.seconds*1000).toLocaleString('ar-EG').replace(/,/g, '') : '';
+                csv += `"${r.student_name}","${r.student_class}","${r.score}/${r.total}","${date}"\n`;
+            });
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "results.csv"; link.click();
+            const link = document.createElement("a"); 
+            link.href = URL.createObjectURL(blob); 
+            link.download = `نتائج_اختبار_الجهاد_${new Date().toLocaleDateString()}.csv`; 
+            link.click();
         }
 
         function verifyTeacherLogin() {
-            if(document.getElementById('teacher-username').value === "Ikram" && document.getElementById('teacher-pin').value === "22") {
-                closeLoginModal(); switchView('dashboard');
-            } else alert("خطأ!");
+            const user = document.getElementById('teacher-username').value;
+            const pin = document.getElementById('teacher-pin').value;
+            if(user === "Ikram" && pin === "22") {
+                closeLoginModal(); 
+                switchView('dashboard');
+                listenToResults();
+            } else {
+                alert("بيانات الدخول غير صحيحة");
+            }
         }
 
         function openLoginModal() { document.getElementById('login-modal').style.display = 'flex'; }
@@ -323,7 +425,9 @@
         }
         function showModal(t, m, i='⚠️', c='موافق', s=false, onC=null) {
             const mod = document.getElementById('custom-modal');
-            document.getElementById('modal-title').innerText=t; document.getElementById('modal-message').innerText=m; document.getElementById('modal-icon').innerText=i;
+            document.getElementById('modal-title').innerText=t; 
+            document.getElementById('modal-message').innerText=m; 
+            document.getElementById('modal-icon').innerText=i;
             document.getElementById('modal-cancel').style.display = s ? 'block' : 'none';
             mod.style.display = 'flex';
             document.getElementById('modal-confirm').onclick = () => { mod.style.display='none'; if(onC) onC(); };
